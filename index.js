@@ -8,8 +8,8 @@ let setToken = (token) => {
     client.login(token);
 }
 
-let setPrefix = (prefix) => {
-    prefix = prefix
+let setPrefix = (newPrefix) => {
+    prefix = newPrefix
 }
 
 let addAdmin = (admin) => {
@@ -37,7 +37,7 @@ let onReady = (callback) => {
 let sendHelpMsg = (message) => { // AUX function
     const newEmbed = new Discord.MessageEmbed().setTitle(`**Commands**`)
     for (let cmdObj of cmdObjs)
-        newEmbed.addField(`**${cmdObj[cmd]}**`, cmdObj[desc])
+        newEmbed.addField(`**${cmdObj["cmd"]}**`, cmdObj["desc"])
     message.reply(newEmbed)
 }
 
@@ -55,7 +55,7 @@ let onMessage = (newCmdObjs) => {
         const command = args.shift().toLowerCase();
         const isAdmin = admins.includes(message.author.id)
         for (let cmdObj of cmdObjs) {
-            if (cmdObj["cmd"] == command && (!cmdObj["admin"] || isAdmin)) {
+            if (cmdObj["cmd"].toLowerCase() == command && (!cmdObj["admin"] || isAdmin)) {
                 cmdObj["exe"](message, cmdObj["params"])
             }
         }
