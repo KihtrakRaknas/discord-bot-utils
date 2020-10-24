@@ -56,7 +56,7 @@ let onMessage = (newCmdObjs) => {
         const isAdmin = admins.includes(message.author.id)
         for (let cmdObj of cmdObjs) {
             if (cmdObj["cmd"].toLowerCase() == command && (!cmdObj["admin"] || isAdmin)) {
-                cmdObj["exe"](message, cmdObj["params"])
+                cmdObj["exe"](message, args, cmdObj["params"])
             }
         }
     })
