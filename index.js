@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const Client = new Discord.Client();
+const client = new Discord.Client();
 let channels = []
 let prefix
 let admins = []
@@ -117,7 +117,7 @@ let askWithReactions = (message, emojiObj) => {
 exports.addChannel = addChannel
 exports.addChannelFromArr = addChannelFromArr
 exports.channels = channels
-exports.Client = Client
+exports.client = client
 exports.onReady = onReady
 exports.onMessage = onMessage
 exports.getSelection = getSelection
