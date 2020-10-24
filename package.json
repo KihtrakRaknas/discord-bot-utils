@@ -19,5 +19,14 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^12.4.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KihtrakRaknas/discord-bot-utils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KihtrakRaknas/discord-bot-utils/issues"
+  },
+  "homepage": "https://github.com/KihtrakRaknas/discord-bot-utils#readme"
 }
