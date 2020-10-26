@@ -83,12 +83,12 @@ let onMessage = (newCmdObjs) => {
 }
 
 
-let addRole = (roleName, member) => {
+let addRole = (m, roleName, member) => {
     let role = member.guild.roles.cache.find(role => role.name === roleName)
     member.roles.add(role)
 }
 
-let addRoleTime = (roleName, member, time, timeArgs) => {
+let addRoleTime = (m, roleName, member, time, timeArgs) => {
     let unit = 60
     if (timeArgs === 's')
         unit = 1
@@ -107,7 +107,7 @@ let getSelection = async (message, emojisObj, sendMedium) => {
     return askWithReactions(await sendMedium.send(message+generateEmojiDesc(emojisObj)), emojisObj)
 }
 
-let generateEmojiDesc = ( emojiObj) => {
+let generateEmojiDesc = (m, emojiObj) => {
     let output = '\n'
     for (let emoji in emojiObj) {
         output += `\n${emoji} -> **${emojiObj[emoji]}**`
