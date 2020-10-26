@@ -4,6 +4,7 @@ let channels = []
 let prefix
 let admins = []
 let cmdObjs
+
 let setToken = (token) => {
     client.login(token);
 }
@@ -26,6 +27,21 @@ let addChannel = (channel) => {
         channels.push(channel)
 }
 
+let addChannelWithId = async (channelID)=>{
+    await clientReady
+    let channelToAdd = guild.channels.cache.find(channel=>channelID == (channel.id))
+    if(channelToAdd){
+      channels.push(channelToAdd)
+    }
+}
+
+let addChannelFromArrWithId = async (channelIDs)=>{
+    await clientReady
+    client.guilds.cache.each(guild=>{
+        guild.channels.cache.filter(channel=>channelIDs.includes(channel.id)).each(channelToAdd=>channels.push(channelToAdd))
+    })
+}
+
 let addChannelFromArr = (channelsArr) => {
     channels = [...new Set([...channelsArr, ...channels])]
 }
@@ -33,6 +49,10 @@ let addChannelFromArr = (channelsArr) => {
 let onReady = (callback) => {
     client.on('ready', callback);
 }
+
+let clientReady = new Promise(res=>{
+    onReady(()=>res())
+})
 
 let sendHelpMsg = (message) => { // AUX function
     const newEmbed = new Discord.MessageEmbed().setTitle(`**Commands**`)
@@ -127,3 +147,6 @@ exports.addAdmin = addAdmin
 exports.addAdminsFromArr = addAdminsFromArr
 exports.addRole = addRole
 exports.addRoleTime = addRoleTime
+exports.addChannelWithId = addChannelWithId
+exports.addChannelFromArrWithId = addChannelFromArrWithId
+
