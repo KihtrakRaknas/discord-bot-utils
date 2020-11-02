@@ -1,6 +1,6 @@
 {
   "name": "@kihtrak/discord-bot-utils",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "A small package created by Karthik Sankar and Franklin Yin to assist in making discord bots",
   "main": "index.js",
   "scripts": {
@@ -18,8 +18,10 @@
   "author": "Karthik Sankar",
   "license": "ISC",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
     "discord.js": "^12.4.1",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "got": "^11.8.0"
   },
   "devDependencies": {},
   "repository": {
