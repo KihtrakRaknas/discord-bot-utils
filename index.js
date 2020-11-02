@@ -1,9 +1,12 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const cheerio = require('cheerio');
+const got = require('got');
 let channels = []
 let prefix
 let admins = []
 let cmdObjs
+let webScrapeUIDs=[]
 
 let setToken = (token) => {
     client.login(token);
@@ -29,7 +32,10 @@ let addChannel = (channel) => {
 
 let addChannelWithId = async (channelID)=>{
     await clientReady
-    let channelToAdd = guild.channels.cache.find(channel=>channelID == (channel.id))
+    let channelToAdd
+    client.guilds.cache.each(guild=>{
+        channelToAdd = guild.channels.cache.find(channel=>channelID == (channel.id))
+    })
     if(channelToAdd){
       channels.push(channelToAdd)
     }
@@ -134,6 +140,26 @@ let askWithReactions = (message, emojiObj) => {
     return emojiSelection;
 }
 
+let getSite = async (url,func)=>{
+    const response = await got(url);
+    const $ = cheerio.load(response.body);
+    func($)
+  }
+  
+  let checkSite = async (url,items,uid,uidAttr,action) => {
+    const response = await got(url);
+    const $ = cheerio.load(response.body);
+  
+    $(items).each((i, el) => {
+      let href = $(uid, el).attr(uidAttr)
+      if(href && !webScrapeUIDs.includes(href)){
+        webScrapeUIDs.push(href)
+        if(action)
+          action(el,href)
+      }
+    }) 
+  }
+
 exports.addChannel = addChannel
 exports.addChannelFromArr = addChannelFromArr
 exports.channels = channels
@@ -149,4 +175,6 @@ exports.addRole = addRole
 exports.addRoleTime = addRoleTime
 exports.addChannelWithId = addChannelWithId
 exports.addChannelFromArrWithId = addChannelFromArrWithId
-
+exports.Discord = Discord
+exports.getSite = getSite
+exports.checkSite = checkSite
