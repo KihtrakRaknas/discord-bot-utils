@@ -8,29 +8,29 @@ let admins = []
 let cmdObjs
 let webScrapeUIDs=[]
 
-let setToken = (token) => {
+const setToken = (token) => {
     client.login(token);
 }
 
-let setPrefix = (newPrefix) => {
+const setPrefix = (newPrefix) => {
     prefix = newPrefix
 }
 
-let addAdmin = (admin) => {
+const addAdmin = (admin) => {
     if (!admins.includes(admin))
         admins.push(admin)
 }
 
-let addAdminsFromArr = (adminsArr) => {
+const addAdminsFromArr = (adminsArr) => {
     admins = [...new Set([...adminsArr, ...admins])]
 }
 
-let addChannel = (channel) => {
+const addChannel = (channel) => {
     if (!channels.includes(channel))
         channels.push(channel)
 }
 
-let addChannelWithId = async (channelID)=>{
+const addChannelWithId = async (channelID)=>{
     await clientReady
     let channelToAdd
     client.guilds.cache.each(guild=>{
@@ -41,33 +41,33 @@ let addChannelWithId = async (channelID)=>{
     }
 }
 
-let addChannelFromArrWithId = async (channelIDs)=>{
+const addChannelFromArrWithId = async (channelIDs)=>{
     await clientReady
     client.guilds.cache.each(guild=>{
         guild.channels.cache.filter(channel=>channelIDs.includes(channel.id)).each(channelToAdd=>channels.push(channelToAdd))
     })
 }
 
-let addChannelFromArr = (channelsArr) => {
+const addChannelFromArr = (channelsArr) => {
     channels = [...new Set([...channelsArr, ...channels])]
 }
 
-let onReady = (callback) => {
+const onReady = (callback) => {
     client.on('ready', callback);
 }
 
-let clientReady = new Promise(res=>{
+const clientReady = new Promise(res=>{
     onReady(()=>res())
 })
 
-let sendHelpMsg = (message) => { // AUX function
+const sendHelpMsg = (message) => { // AUX function
     const newEmbed = new Discord.MessageEmbed().setTitle(`**Commands**`)
     for (let cmdObj of cmdObjs)
         newEmbed.addField(`**${cmdObj["cmd"]}**`, cmdObj["desc"])
     message.reply(newEmbed)
 }
 
-let onMessage = (newCmdObjs) => {
+const onMessage = (newCmdObjs) => {
     cmdObjs = [...newCmdObjs, {
         cmd: "help",
         desc: "This command!",
@@ -89,12 +89,12 @@ let onMessage = (newCmdObjs) => {
 }
 
 
-let addRole = (m, roleName, member) => {
+const addRole = (m, roleName, member) => {
     let role = member.guild.roles.cache.find(role => role.name === roleName)
     member.roles.add(role)
 }
 
-let addRoleTime = (m, roleName, member, time, timeArgs) => {
+const addRoleTime = (m, roleName, member, time, timeArgs) => {
     let unit = 60
     if (timeArgs === 's')
         unit = 1
@@ -109,11 +109,11 @@ let addRoleTime = (m, roleName, member, time, timeArgs) => {
     setTimeout(() => { member.roles.remove(role) }, time * unit * 1000)
 }
 
-let getSelection = async (message, emojisObj, sendMedium) => {
+const getSelection = async (message, emojisObj, sendMedium) => {
     return askWithReactions(await sendMedium.send(message+generateEmojiDesc(emojisObj)), emojisObj)
 }
 
-let generateEmojiDesc = (m, emojiObj) => {
+const generateEmojiDesc = (m, emojiObj) => {
     let output = '\n'
     for (let emoji in emojiObj) {
         output += `\n${emoji} -> **${emojiObj[emoji]}**`
@@ -121,7 +121,7 @@ let generateEmojiDesc = (m, emojiObj) => {
     return output
 }
 
-let askWithReactions = (message, emojiObj) => {
+const askWithReactions = (message, emojiObj) => {
     emojiArr = Object.keys(emojiObj)
     for (let emoji of emojiArr)
         message.react(emoji)
