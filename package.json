@@ -1,10 +1,12 @@
 {
   "name": "@kihtrak/discord-bot-utils",
-  "version": "3.12.0",
+  "version": "3.13.0",
   "description": "A small package created by Karthik Sankar and Franklin Yin to assist in making discord bots",
-  "main": "index.js",
+  "main": "min.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "npm run uglify && npm version minor --force && npm publish",
+    "uglify": "uglifyjs --compress --mangle --output min.js -- index.js"
   },
   "keywords": [
     "discord",
@@ -23,7 +25,9 @@
     "dotenv": "^8.2.0",
     "got": "^11.8.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "uglify-es": "^3.3.9"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/KihtrakRaknas/discord-bot-utils.git"
