@@ -6,7 +6,7 @@ let channels = []
 let prefix
 let admins = []
 let cmdObjs
-let webScrapeUIDs=[]
+let webScrapeUIDs = []
 
 let setToken = (token) => {
     client.login(token);
@@ -30,21 +30,21 @@ let addChannel = (channel) => {
         channels.push(channel)
 }
 
-let addChannelWithId = async (channelID)=>{
+let addChannelWithId = async (channelID) => {
     await clientReady
     let channelToAdd
-    client.guilds.cache.each(guild=>{
-        channelToAdd = guild.channels.cache.find(channel=>channelID == (channel.id))
+    client.guilds.cache.each(guild => {
+        channelToAdd = guild.channels.cache.find(channel => channelID == (channel.id))
     })
-    if(channelToAdd){
-      channels.push(channelToAdd)
+    if (channelToAdd) {
+        channels.push(channelToAdd)
     }
 }
 
-let addChannelFromArrWithId = async (channelIDs)=>{
+let addChannelFromArrWithId = async (channelIDs) => {
     await clientReady
-    client.guilds.cache.each(guild=>{
-        guild.channels.cache.filter(channel=>channelIDs.includes(channel.id)).each(channelToAdd=>channels.push(channelToAdd))
+    client.guilds.cache.each(guild => {
+        guild.channels.cache.filter(channel => channelIDs.includes(channel.id)).each(channelToAdd => channels.push(channelToAdd))
     })
 }
 
@@ -56,8 +56,8 @@ let onReady = (callback) => {
     client.on('ready', callback);
 }
 
-let clientReady = new Promise(res=>{
-    onReady(()=>res())
+let clientReady = new Promise(res => {
+    onReady(() => res())
 })
 
 let sendHelpMsg = (message) => { // AUX function
@@ -72,8 +72,8 @@ let onMessage = (newCmdObjs) => {
         cmd: "help",
         desc: "This command!",
         exe: sendHelpMsg,
-        params:null,
-        admin:false
+        params: null,
+        admin: false
     }]
     client.on('message', message => {
         if (!message.content.startsWith(prefix) || message.author.bot) return;
@@ -103,14 +103,14 @@ let addRoleTime = (m, roleName, member, time, timeArgs) => {
     if (timeArgs === 'h')
         unit = 3600
     if (timeArgs === 'd')
-        unit = 3600*24
+        unit = 3600 * 24
     let role = member.guild.roles.cache.find(role => role.name === roleName)
     member.roles.add(role)
     setTimeout(() => { member.roles.remove(role) }, time * unit * 1000)
 }
 
 let getSelection = async (message, emojisObj, sendMedium) => {
-    return askWithReactions(await sendMedium.send(message+generateEmojiDesc(emojisObj)), emojisObj)
+    return askWithReactions(await sendMedium.send(message + generateEmojiDesc(emojisObj)), emojisObj)
 }
 
 let generateEmojiDesc = (m, emojiObj) => {
@@ -140,25 +140,29 @@ let askWithReactions = (message, emojiObj) => {
     return emojiSelection;
 }
 
-let getSite = async (url,func)=>{
+let getSite = async (url, func) => {
     const response = await got(url);
     const $ = cheerio.load(response.body);
     func($)
-  }
-  
-  let checkSite = async (url,items,uid,uidAttr,action) => {
+}
+
+let checkSite = async (url, items, uid, uidAttr, action) => {
     const response = await got(url);
     const $ = cheerio.load(response.body);
-  
+
     $(items).each((i, el) => {
-      let href = $(uid, el).attr(uidAttr)
-      if(href && !webScrapeUIDs.includes(href)){
-        webScrapeUIDs.push(href)
-        if(action)
-          action(el,href)
-      }
-    }) 
-  }
+        let href = $(uid, el).attr(uidAttr)
+        if (href && !webScrapeUIDs.includes(href)) {
+            webScrapeUIDs.push(href)
+            if (action)
+                action(el, href)
+        }
+    })
+}
+
+let delWebScrapeUIDs = () => {
+    delete webScrapeUIDs[0]
+}
 
 exports.addChannel = addChannel
 exports.addChannelFromArr = addChannelFromArr
@@ -178,3 +182,4 @@ exports.addChannelFromArrWithId = addChannelFromArrWithId
 exports.Discord = Discord
 exports.getSite = getSite
 exports.checkSite = checkSite
+exports.delWebScrapeUIDs = delWebScrapeUIDs
