@@ -158,15 +158,27 @@ let mute = (m, member) => {
 }
 
 let muteTime = (m, member, time, timeArgs) => {
-    let unit = 60
-    if (timeArgs === 's')
+    let unit = 1
+    let longUnit='seconds'
+    if (timeArgs.charAt(0) === 's'){
         unit = 1
-    if (timeArgs === 'm')
-        unit = 60
-    if (timeArgs === 'h')
-        unit = 3600
-    if (timeArgs === 'd')
+        longUnit='seconds'
+    }
+    else if (timeArgs.charAt(0) === 'm'){
+        unit=60
+        longUnit='minutes'
+    }
+    else if (timeArgs.charAt(0) === 'h'){
+        unit=3600
+        longUnit='hours'
+    }
+    else if (timeArgs.charAt(0) === 'd'){
         unit = 3600 * 24
+        longUnit='days'
+    }
+    else{
+        m.channel.send("Invalid input. Using seconds as unit of time.")
+    }
     let role = m.guild.roles.cache.find(role => role.name === "Muted")
     if(typeof role === 'undefined'){
         m.guild.roles.create({ data: { name: "Muted", permissions: [] } })
@@ -174,7 +186,7 @@ let muteTime = (m, member, time, timeArgs) => {
     }
     else{
         member.roles.add(role)
-    m.channel.send(member.user.tag+" has been muted for "+time+" "+timeArgs)
+    m.channel.send(member.user.tag+" has been muted for "+time+" "+longUnit)
     setTimeout(() => { member.roles.remove(role)
         m.channel.send(member.user.tag+" is no longer muted.") }, time * unit * 1000)
     }
