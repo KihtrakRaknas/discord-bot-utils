@@ -148,7 +148,7 @@ let addRoleTime = (m, roleName, member, time, timeArgs) => {
 let mute = (m, member) => {
     let role = m.guild.roles.cache.find(role => role.name === "Muted")
     if(role==null){
-        guild.roles.create({ data: { name: 'Muted', permissions: [] } })
+        m.guild.roles.create({ data: { name: 'Muted', permissions: [] } })
     }
     m.channel.send(member.user.tag+" has been muted.")
     member.roles.add(role)
@@ -166,7 +166,7 @@ let muteTime = (m, member, time, timeArgs) => {
         unit = 3600 * 24
     let role = m.guild.roles.cache.find(role => role.name === "Muted")
     if(role==null){
-        guild.roles.create({ data: { name: 'Muted', permissions: [] } })
+        m.guild.roles.create({ data: { name: 'Muted', permissions: [] } })
     }
     member.roles.add(role)
     m.channel.send(member.user.tag+" has been muted for "+time+" "+timeArgs)
