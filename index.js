@@ -147,12 +147,14 @@ let addRoleTime = (m, roleName, member, time, timeArgs) => {
 
 let mute = (m, member) => {
     let role = m.guild.roles.cache.find(role => role.name === "Muted")
-    if(!role){
-        m.guild.roles.create({ data: { name: 'Muted', permissions: [] } })
-        m.channel.send("No muted role found, created one. ")
+    if(typeof role === 'undefined'){
+        m.guild.roles.create({ data: { name: "Muted", permissions: [] } })
+        m.channel.send("No muted role found, but I've created one. Please send the command again.")
     }
-    m.channel.send(member.user.tag+" has been muted.")
-    member.roles.add(role)
+    else{
+        m.channel.send(member.user.tag+" has been muted.")
+        member.roles.add(role)
+    }
 }
 
 let muteTime = (m, member, time, timeArgs) => {
@@ -166,14 +168,16 @@ let muteTime = (m, member, time, timeArgs) => {
     if (timeArgs === 'd')
         unit = 3600 * 24
     let role = m.guild.roles.cache.find(role => role.name === "Muted")
-    if(!role){
-        m.guild.roles.create({ data: { name: 'Muted', permissions: [] } })
-        m.channel.send("No muted role found, created one. ")
+    if(typeof role === 'undefined'){
+        m.guild.roles.create({ data: { name: "Muted", permissions: [] } })
+        m.channel.send("No muted role found, but I've created one. Please send the command again.")
     }
-    member.roles.add(role)
+    else{
+        member.roles.add(role)
     m.channel.send(member.user.tag+" has been muted for "+time+" "+timeArgs)
     setTimeout(() => { member.roles.remove(role)
         m.channel.send(member.user.tag+" is no longer muted.") }, time * unit * 1000)
+    }
 }
 
 let getSelection = async (message, emojisObj, sendMedium) => {
