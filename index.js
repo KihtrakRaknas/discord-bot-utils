@@ -105,6 +105,11 @@ let onMessage = (newCmdObjs) => {
         admin: false
     }]
     client.on('message', message => {
+        message.member.roles.cache.forEach(r => {
+            console.log(r.name)
+            if(r.name==='Muted')
+                message.delete()
+        });
         if (!message.content.startsWith(prefix) || message.author.bot) return;
         const args = message.content.slice(prefix.length).trim().split(' ');
         const command = args.shift().toLowerCase();
