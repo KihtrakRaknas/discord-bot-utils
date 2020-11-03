@@ -221,7 +221,7 @@ let checkSite = async (url, items, uid, uidAttr, action) => {
 }
 
 let delWebScrapeUIDs = () => {
-    delete webScrapeUIDs[0]
+    webScrapeUIDs.shift()
 }
 
 exports.addChannel = addChannel
