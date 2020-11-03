@@ -33,7 +33,7 @@ onReady(async ()=>{
     //console.log("key: "+key)
     let body
     try{
-        body = (await got('https://verify-util.herokuapp.com//check', {searchParams: {hash: hash(key), auth:process.env.REMOTEVERIFICATIONSERVERCODE},responseType: 'json'})).body
+        body = (await got('https://verify-util.herokuapp.com/check', {searchParams: {hash: hash(key), auth:process.env.REMOTEVERIFICATIONSERVERCODE},responseType: 'json'})).body
     }catch(e){
         console.log("Verify Failed: "+e)
     }
