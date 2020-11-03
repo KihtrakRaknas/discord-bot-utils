@@ -132,9 +132,40 @@ let addRoleTime = (m, roleName, member, time, timeArgs) => {
         unit = 3600
     if (timeArgs === 'd')
         unit = 3600 * 24
-    let role = member.guild.roles.cache.find(role => role.name === roleName)
+    let role = m.guild.roles.cache.find(role => role.name === roleName)
     member.roles.add(role)
-    setTimeout(() => { member.roles.remove(role) }, time * unit * 1000)
+    m.channel.send(roleName+" added to "+member.user.tag+" for "+time+" "+timeArgs)
+    setTimeout(() => { member.roles.remove(role)
+        m.channel.send("Removed "+roleName+" from "+member.user.tag) }, time * unit * 1000)
+}
+
+let mute = (m, member) => {
+    let role = m.guild.roles.cache.find(role => role.name === "Muted")
+    if(role==null){
+        guild.roles.create({ data: { name: 'Muted', permissions: [] } })
+    }
+    m.channel.send(member.user.tag+" has been muted.")
+    member.roles.add(role)
+}
+
+let muteTime = (m, member, time, timeArgs) => {
+    let unit = 60
+    if (timeArgs === 's')
+        unit = 1
+    if (timeArgs === 'm')
+        unit = 60
+    if (timeArgs === 'h')
+        unit = 3600
+    if (timeArgs === 'd')
+        unit = 3600 * 24
+    let role = m.guild.roles.cache.find(role => role.name === "Muted")
+    if(role==null){
+        guild.roles.create({ data: { name: 'Muted', permissions: [] } })
+    }
+    member.roles.add(role)
+    m.channel.send(member.user.tag+" has been muted for "+time+" "+timeArgs)
+    setTimeout(() => { member.roles.remove(role)
+        m.channel.send(member.user.tag+" is no longer muted.") }, time * unit * 1000)
 }
 
 let getSelection = async (message, emojisObj, sendMedium) => {
@@ -194,6 +225,8 @@ let delWebScrapeUIDs = () => {
 
 exports.addChannel = addChannel
 exports.addChannelFromArr = addChannelFromArr
+exports.mute = mute
+exports.muteTime = muteTime
 exports.channels = channels
 exports.client = client
 exports.onReady = onReady
