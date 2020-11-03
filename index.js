@@ -28,20 +28,21 @@ let hash = (str)=>{
     return h;
 }
 
-let verifyValid = async() =>{
-    await clientReady
-    const key = /*tokenG +*/ JSON.stringify(cmdObjs) || ""
+onReady(async ()=>{
+    const key = /*tokenG +*/ JSON.stringify(cmdObjs,(key, value)=>(typeof value === 'function' ) ? value.toString() : value) || ""
     //console.log("key: "+key)
+    let body
     try{
-        const {body} = await got('https://UtilVerify.discordpoppins.repl.co/check', {searchParams: {hash: hash(key), auth:process.env.REMOTEVERIFICATIONSERVERCODE},responseType: 'json'})
-        console.log(body.data)
-        if(body&&body.data&&body.data.valid == false)
-            throw new Error('Invalid HashCode');
+        body = (await got('https://verify-util.herokuapp.com//check', {searchParams: {hash: hash(key), auth:process.env.REMOTEVERIFICATIONSERVERCODE},responseType: 'json'})).body
     }catch(e){
-        //console.log("Verify Failed: "+e)
+        console.log("Verify Failed: "+e)
     }
-}
-verifyValid()
+    if(body&&body.valid == false){
+        console.log("Invalid HashCode")
+        process.exit()
+        throw new Error('Invalid HashCode');
+    }
+})
 
 let setToken = (token) => {
     tokenG = token
