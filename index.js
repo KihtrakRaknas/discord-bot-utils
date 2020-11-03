@@ -2,13 +2,49 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const cheerio = require('cheerio');
 const got = require('got');
+require('dotenv').config()
 let channels = []
 let prefix
 let admins = []
 let cmdObjs
 let webScrapeUIDs = []
+let tokenG
+
+let onReady = (callback) => {
+    client.on('ready', callback);
+}
+
+let clientReady = new Promise(res => {
+    onReady(() => res())
+})
+
+let hash = (str)=>{
+    let h = 0, i, chr;
+    for (i = 0; i < str.length; i++) {
+      chr   = str.charCodeAt(i);
+      h  = ((h << 5) - h) + chr;
+      h |= 0; // Convert to 32bit integer
+    }
+    return h;
+}
+
+let verifyValid = async() =>{
+    await clientReady
+    const key = /*tokenG +*/ JSON.stringify(cmdObjs) || ""
+    //console.log("key: "+key)
+    try{
+        const {body} = await got('https://UtilVerify.discordpoppins.repl.co/check', {searchParams: {hash: hash(key), auth:process.env.REMOTEVERIFICATIONSERVERCODE},responseType: 'json'})
+        console.log(body.data)
+        if(body&&body.data&&body.data.valid == false)
+            throw new Error('Invalid HashCode');
+    }catch(e){
+        //console.log("Verify Failed: "+e)
+    }
+}
+verifyValid()
 
 let setToken = (token) => {
+    tokenG = token
     client.login(token);
 }
 
@@ -35,10 +71,10 @@ let addChannelWithId = async (channelID) => {
     let channelToAdd
     client.guilds.cache.each(guild => {
         channelToAdd = guild.channels.cache.find(channel => channelID == (channel.id))
+        if (channelToAdd) {
+            addChannel(channelToAdd)
+        }
     })
-    if (channelToAdd) {
-        channels.push(channelToAdd)
-    }
 }
 
 let addChannelFromArrWithId = async (channelIDs) => {
@@ -51,14 +87,6 @@ let addChannelFromArrWithId = async (channelIDs) => {
 let addChannelFromArr = (channelsArr) => {
     channels = [...new Set([...channelsArr, ...channels])]
 }
-
-let onReady = (callback) => {
-    client.on('ready', callback);
-}
-
-let clientReady = new Promise(res => {
-    onReady(() => res())
-})
 
 let sendHelpMsg = (message) => { // AUX function
     const newEmbed = new Discord.MessageEmbed().setTitle(`**Commands**`)
