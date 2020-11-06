@@ -8,14 +8,13 @@ let prefix
 let admins = []
 let cmdObjs
 let webScrapeUIDs = []
-let tokenG
 
-let onReady = (callback) => {
+exports.onReady = (callback) => {
     client.on('ready', callback);
 }
 
 let clientReady = new Promise(res => {
-    onReady(() => res())
+    exports.onReady(() => res())
 })
 
 let hash = (str)=>{
@@ -28,9 +27,8 @@ let hash = (str)=>{
     return h;
 }
 
-onReady(async ()=>{
-    const key = /*tokenG +*/ JSON.stringify(cmdObjs,(key, value)=>(typeof value === 'function' ) ? value.toString() : value) || ""
-    //console.log("key: "+key)
+exports.onReady(async ()=>{
+    const key = JSON.stringify(cmdObjs,(key, value)=>(typeof value === 'function' ) ? value.toString() : value) || ""
     let body
     try{
         body = (await got('https://verify-util.herokuapp.com/check', {searchParams: {hash: hash(key), auth:process.env.REMOTEVERIFICATIONSERVERCODE},responseType: 'json'})).body
@@ -44,30 +42,29 @@ onReady(async ()=>{
     }
 })
 
-let setToken = (token) => {
-    tokenG = token
+exports.setToken = (token) => {
     client.login(token);
 }
 
-let setPrefix = (newPrefix) => {
+exports.setPrefix = (newPrefix) => {
     prefix = newPrefix
 }
 
-let addAdmin = (admin) => {
+exports.addAdmin = (admin) => {
     if (!admins.includes(admin))
         admins.push(admin)
 }
 
-let addAdminsFromArr = (adminsArr) => {
+exports.addAdminsFromArr = (adminsArr) => {
     admins = [...new Set([...adminsArr, ...admins])]
 }
 
-let addChannel = (channel) => {
+exports.addChannel = (channel) => {
     if (!channels.includes(channel))
         channels.push(channel)
 }
 
-let addChannelWithId = async (channelID) => {
+exports.addChannelWithId = async (channelID) => {
     await clientReady
     let channelToAdd
     client.guilds.cache.each(guild => {
@@ -78,25 +75,25 @@ let addChannelWithId = async (channelID) => {
     })
 }
 
-let addChannelFromArrWithId = async (channelIDs) => {
+exports.addChannelFromArrWithId = async (channelIDs) => {
     await clientReady
     client.guilds.cache.each(guild => {
         guild.channels.cache.filter(channel => channelIDs.includes(channel.id)).each(channelToAdd => channels.push(channelToAdd))
     })
 }
 
-let addChannelFromArr = (channelsArr) => {
+exports.addChannelFromArr = (channelsArr) => {
     channels = [...new Set([...channelsArr, ...channels])]
 }
 
-let sendHelpMsg = (message) => { // AUX function
+exports.sendHelpMsg = (message) => { // AUX function
     const newEmbed = new Discord.MessageEmbed().setTitle(`**Commands**`)
     for (let cmdObj of cmdObjs)
         newEmbed.addField(`**${cmdObj["cmd"]}**`, cmdObj["desc"])
     message.reply(newEmbed)
 }
 
-let onMessage = (newCmdObjs) => {
+exports.onMessage = (newCmdObjs) => {
     cmdObjs = [...newCmdObjs, {
         cmd: "help",
         desc: "This command!",
@@ -118,12 +115,12 @@ let onMessage = (newCmdObjs) => {
 }
 
 
-let addRole = (m, roleName, member) => {
+exports.addRole = (m, roleName, member) => {
     let role = member.guild.roles.cache.find(role => role.name === roleName)
     member.roles.add(role)
 }
 
-let addRoleTime = (m, roleName, member, time, timeArgs) => {
+exports.addRoleTime = (m, roleName, member, time, timeArgs) => {
     let unit = 60
     if (timeArgs === 's')
         unit = 1
@@ -140,7 +137,7 @@ let addRoleTime = (m, roleName, member, time, timeArgs) => {
         m.channel.send("Removed "+roleName+" from "+member.user.tag) }, time * unit * 1000)
 }
 
-let mute = (m, member) => {
+exports.mute = (m, member) => {
     let role = m.guild.roles.cache.find(role => role.name === "Muted")
     if(role==null){
         guild.roles.create({ data: { name: 'Muted', permissions: [] } })
@@ -149,7 +146,7 @@ let mute = (m, member) => {
     member.roles.add(role)
 }
 
-let muteTime = (m, member, time, timeArgs) => {
+exports.muteTime = (m, member, time, timeArgs) => {
     let unit = 60
     if (timeArgs === 's')
         unit = 1
@@ -181,7 +178,7 @@ let generateEmojiDesc = (m, emojiObj) => {
     return output
 }
 
-let askWithReactions = (message, emojiObj) => {
+exports.askWithReactions = (message, emojiObj) => {
     emojiArr = Object.keys(emojiObj)
     for (let emoji of emojiArr)
         message.react(emoji)
@@ -200,48 +197,6 @@ let askWithReactions = (message, emojiObj) => {
     return emojiSelection;
 }
 
-let getSite = async (url, func) => {
-    const response = await got(url);
-    const $ = cheerio.load(response.body);
-    func($)
-}
-
-let checkSite = async (url, items, uid, uidAttr, action) => {
-    const response = await got(url);
-    const $ = cheerio.load(response.body);
-
-    $(items).each((i, el) => {
-        let href = $(uid, el).attr(uidAttr)
-        if (href && !webScrapeUIDs.includes(href)) {
-            webScrapeUIDs.push(href)
-            if (action)
-                action(el, href)
-        }
-    })
-}
-
-let delWebScrapeUIDs = () => {
-    webScrapeUIDs.shift()
-}
-
-exports.addChannel = addChannel
-exports.addChannelFromArr = addChannelFromArr
-exports.mute = mute
-exports.muteTime = muteTime
 exports.channels = channels
 exports.client = client
-exports.onReady = onReady
-exports.onMessage = onMessage
-exports.getSelection = getSelection
-exports.setToken = setToken
-exports.setPrefix = setPrefix
-exports.addAdmin = addAdmin
-exports.addAdminsFromArr = addAdminsFromArr
-exports.addRole = addRole
-exports.addRoleTime = addRoleTime
-exports.addChannelWithId = addChannelWithId
-exports.addChannelFromArrWithId = addChannelFromArrWithId
 exports.Discord = Discord
-exports.getSite = getSite
-exports.checkSite = checkSite
-exports.delWebScrapeUIDs = delWebScrapeUIDs
