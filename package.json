@@ -1,12 +1,12 @@
 {
   "name": "@kihtrak/discord-bot-utils",
-  "version": "4.23.0",
+  "version": "4.24.0",
   "description": "A small package created by Karthik Sankar and Franklin Yin to assist in making discord bots",
   "main": "min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "npm run uglify && npm version minor --force && npm publish",
-    "uglify": "uglifyjs --compress --mangle --output min.js -- index.js webscrape.js"
+    "uglify": "uglifyjs --compress --mangle --output min.js -- src/index.js src/webscrape.js"
   },
   "keywords": [
     "discord",
