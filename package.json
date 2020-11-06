@@ -1,6 +1,6 @@
 {
   "name": "@kihtrak/discord-bot-utils",
-  "version": "4.31.0",
+  "version": "4.32.0",
   "description": "A small package created by Karthik Sankar and Franklin Yin to assist in making discord bots",
   "main": "min.js",
   "scripts": {
@@ -20,6 +20,7 @@
   "author": "Karthik Sankar",
   "license": "ISC",
   "dependencies": {
+    "@firebase/database": "^0.7.1",
     "@replit/database": "^2.0.0",
     "cheerio": "^1.0.0-rc.3",
     "discord.js": "^12.4.1",
