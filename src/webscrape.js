@@ -1,3 +1,6 @@
+const cheerio = require('cheerio');
+//const got = require('got');
+let webScrapeUIDs = []
 exports.getSite = async (url, func) => {
     const response = await got(url);
     const $ = cheerio.load(response.body);

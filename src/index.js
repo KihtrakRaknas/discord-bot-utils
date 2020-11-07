@@ -1,13 +1,18 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const cheerio = require('cheerio');
 const got = require('got');
 require('dotenv').config()
 let channels = []
 let prefix
 let admins = []
 let cmdObjs
-let webScrapeUIDs = []
+let isDebug = false
+
+exports.isDebug = isDebug
+exports.channels = channels
+exports.client = client
+exports.Discord = Discord
+
 
 exports.onReady = (callback) => {
     client.on('ready', callback);
@@ -16,6 +21,11 @@ exports.onReady = (callback) => {
 let clientReady = new Promise(res => {
     exports.onReady(() => res())
 })
+exports.clientReady = clientReady
+
+exports.isDebug = ()=>{
+    isDebug = true
+}
 
 let hash = (str)=>{
     let h = 0, i, chr;
@@ -86,10 +96,10 @@ exports.addChannelFromArr = (channelsArr) => {
     channels = [...new Set([...channelsArr, ...channels])]
 }
 
-exports.sendHelpMsg = (message) => { // AUX function
+let sendHelpMsg = (message) => { // AUX function
     const newEmbed = new Discord.MessageEmbed().setTitle(`**Commands**`)
     for (let cmdObj of cmdObjs)
-        newEmbed.addField(`**${cmdObj["cmd"]}**`, cmdObj["desc"])
+        newEmbed.addField(`**${cmdObj["cmd"]?cmdObj["cmd"]:cmdObj["cmds"][0]}**`, cmdObj["desc"])
     message.reply(newEmbed)
 }
 
@@ -103,7 +113,6 @@ exports.onMessage = (newCmdObjs) => {
     }]
     client.on('message', message => {
         message.member.roles.cache.forEach(r => {
-            console.log(r.name)
             if(r.name==='Muted')
                 message.delete()
         });
@@ -112,8 +121,10 @@ exports.onMessage = (newCmdObjs) => {
         const command = args.shift().toLowerCase();
         const isAdmin = admins.includes(message.author.id)
         for (let cmdObj of cmdObjs) {
-            if (cmdObj["cmd"].toLowerCase() == command && (!cmdObj["admin"] || isAdmin)) {
-                cmdObj["exe"](message, args, cmdObj["params"])
+            if ((cmdObj["cmd"]&&cmdObj["cmd"].toLowerCase() == command)||(cmdObj["cmds"]&&cmdObj["cmds"].includes(command))) {
+                if(!cmdObj["admin"] || isAdmin){
+                    cmdObj["exe"](message, args, cmdObj["params"])
+                }
             }
         }
     })
@@ -188,38 +199,3 @@ exports.muteTime = (m, member, time, timeArgs) => {
         m.channel.send(member.user.tag+" is no longer muted.") }, time * unit * 1000)
     }
 }
-
-let getSelection = async (message, emojisObj, sendMedium) => {
-    return askWithReactions(await sendMedium.send(message + generateEmojiDesc(emojisObj)), emojisObj)
-}
-
-let generateEmojiDesc = (m, emojiObj) => {
-    let output = '\n'
-    for (let emoji in emojiObj) {
-        output += `\n${emoji} -> **${emojiObj[emoji]}**`
-    }
-    return output
-}
-
-exports.askWithReactions = (message, emojiObj) => {
-    emojiArr = Object.keys(emojiObj)
-    for (let emoji of emojiArr)
-        message.react(emoji)
-    const reactions = new Discord.ReactionCollector(message, reaction => true);
-    let emojiSelection = new Promise((res, rej) => {
-        reactions.on('collect', reaction => {
-            if (reaction.count > 1) {
-                if (emojiArr.includes(reaction.emoji.name))
-                    message.reactions.removeAll().catch(() => { }/*error => console.log('Failed to clear reactions')*/);
-                reactions.stop()
-                res(emojiObj[reaction.emoji.name])
-            }
-        })
-    });
-
-    return emojiSelection;
-}
-
-exports.channels = channels
-exports.client = client
-exports.Discord = Discord
