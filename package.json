@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "npm run uglify && npm version minor --force && npm publish",
-    "uglify": "uglifyjs --compress --mangle --output min.js -- src/index.js src/webscrape.js src/embed.js src/database.js"
+    "uglify": "uglifyjs --compress --mangle --output min.js -- src/index.js src/webscrape.js src/embed.js src/database.js src/reaction.js"
   },
   "keywords": [
     "discord",
