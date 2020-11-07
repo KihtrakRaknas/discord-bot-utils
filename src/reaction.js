@@ -6,6 +6,7 @@ let generateEmojiDesc = (m, emojiObj) => {
     return output
 }
 
+//TODO use listenForReaction for this func
 let askWithReactions = (message, emojiObj) => {
     emojiArr = Object.keys(emojiObj)
     for (let emoji of emojiArr)
@@ -23,6 +24,18 @@ let askWithReactions = (message, emojiObj) => {
     });
 
     return emojiSelection;
+}
+
+let listenForReaction = (message,emojiObj,id,callback)=>{//user.id (optional)
+    const emojiArr = Object.keys(emojiObj)
+    for (let emoji of emojiArr)
+        message.react(emoji)
+    const collector = message.createReactionCollector((reaction, user) =>(emojiArr.includes(reaction.emoji.name) && (id == null || user.id === id)), { time: 60000 })
+    collector.on('collect', (reaction, user) => {
+        if (reaction.count > 1) {
+            callback(emojiObj[reaction.emoji.name],user)
+        }
+    });
 }
 
 exports.getSelection = async (message, emojisObj, sendMedium) => {

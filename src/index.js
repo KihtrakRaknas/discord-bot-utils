@@ -80,7 +80,7 @@ exports.addChannelWithId = async (channelID) => {
     client.guilds.cache.each(guild => {
         channelToAdd = guild.channels.cache.find(channel => channelID == (channel.id))
         if (channelToAdd) {
-            addChannel(channelToAdd)
+            exports.addChannel(channelToAdd)
         }
     })
 }
@@ -104,6 +104,16 @@ let sendHelpMsg = (message) => { // AUX function
 }
 
 exports.onMessage = (newCmdObjs) => {
+    if(isDebug)
+        newCmdObjs = [...newCmdObjs, {
+            cmd: "dev",
+            desc: "Contact the bot devs",
+            exe: (message,args,params)=>{
+                message.reply("Join a server with the devs here: https://discord.gg/kYDJ9sqpjT")
+            },
+            params: null,
+            admin: false
+        }]
     cmdObjs = [...newCmdObjs, {
         cmd: "help",
         desc: "This command!",

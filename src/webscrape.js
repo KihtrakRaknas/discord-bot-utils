@@ -1,6 +1,6 @@
 const cheerio = require('cheerio');
 //const got = require('got');
-let webScrapeUIDs = []
+let webScrapeUIDs = null
 exports.getSite = async (url, func) => {
     const response = await got(url);
     const $ = cheerio.load(response.body);
@@ -8,6 +8,11 @@ exports.getSite = async (url, func) => {
 }
 
 exports.checkSite = async (url, items, uid, uidAttr, action) => {
+    if(!webScrapeUIDs){
+        const webscrapeArr = await exports.dbRead("webScrapeUIDs-package-var")
+        webScrapeUIDs = webscrapeArr?webscrapeArr:[]
+    }
+         
     const response = await got(url);
     const $ = cheerio.load(response.body);
 
@@ -19,6 +24,7 @@ exports.checkSite = async (url, items, uid, uidAttr, action) => {
                 action(el, href)
         }
     })
+    exports.dbWrite("webScrapeUIDs-package-var",webScrapeUIDs)
 }
 
 exports.delWebScrapeUIDs = () => {

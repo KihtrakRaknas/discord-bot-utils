@@ -7,6 +7,9 @@ exports.initDB = (type, setUpObj)=>{
                 cleanKeys:false //optional
             }
         */
+
+        if(!setUpObj)
+         setUpObj={} 
         const Database = require("@replit/database")
         const db = new Database()
         let cleanKey = (key)=>{
