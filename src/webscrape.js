@@ -9,7 +9,11 @@ exports.getSite = async (url, func) => {
 
 exports.checkSite = async (url, items, uid, uidAttr, action) => {
     if(!webScrapeUIDs){
-        const webscrapeArr = await exports.dbRead("webScrapeUIDs-package-var")
+        let webscrapeArr = null
+        if(exports.dbRead)
+            webscrapeArr = await exports.dbRead("webScrapeUIDs-package-var")
+        else if(isDebug)
+            console.log(`Tried to read from webScrapeUIDs-package-var but no DB init`)
         webScrapeUIDs = webscrapeArr?webscrapeArr:[]
     }
          
@@ -24,7 +28,10 @@ exports.checkSite = async (url, items, uid, uidAttr, action) => {
                 action(el, href)
         }
     })
-    exports.dbWrite("webScrapeUIDs-package-var",webScrapeUIDs)
+    if(exports.dbWrite)
+        exports.dbWrite("webScrapeUIDs-package-var",webScrapeUIDs)
+    else if(isDebug)
+        console.log(`Tried to write to webScrapeUIDs-package-var but no DB init`)
 }
 
 exports.delWebScrapeUIDs = () => {

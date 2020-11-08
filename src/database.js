@@ -1,5 +1,4 @@
-let writeFunc;
-let readFunc;
+
 exports.initDB = (type, setUpObj)=>{
     if(type == "repl"){
         /*
@@ -15,7 +14,7 @@ exports.initDB = (type, setUpObj)=>{
         let cleanKey = (key)=>{
             return key.split("#").join(" ")
         }
-        let replWrite=(key,value)=>{
+        exports.dbWrite = (key,value)=>{
             if(setUpObj.cleanKeys)
                 key = cleanKey(key)
             if(typeof value != "object")
@@ -33,7 +32,7 @@ exports.initDB = (type, setUpObj)=>{
             })
         }
 
-        let replRead=(key)=>{
+        exports.dbRead =(key)=>{
             if(setUpObj.cleanKeys)
                 key = cleanKey(key)
             return db.get(key).then(value=>{
@@ -46,11 +45,14 @@ exports.initDB = (type, setUpObj)=>{
         }
 
         exports.dbIncrement = (key,inc)=>{
-            return replRead(key).then(val=>replWrite(key,(val&&(typeof val == "number"|| typeof val == "string"))?(val+inc):inc)) 
+            return exports.dbRead(key).then(val=>exports.dbWrite(key,(val&&(typeof val == "number"|| typeof val == "string"))?(val+inc):inc)) 
         }
-
-        writeFunc = replWrite
-        readFunc = replRead
+        exports.dbPush = (key,newEl)=>{
+            return exports.dbRead(key).then(val=>exports.dbWrite(key,(val&&typeof val == "object")?[...val, newEl]:[newEl])) 
+        }
+        exports.dbPushMulti = (key,newEls)=>{
+            return exports.dbRead(key).then(val=>exports.dbWrite(key,(val&&typeof val == "object")?[...val, ...newEls]:[...newEls])) 
+        }
     }else if(type == "sheets"){
         /*  SETUPOBJ SCHEMA
         {
@@ -71,12 +73,4 @@ exports.initDB = (type, setUpObj)=>{
         })()
     }
     
-}
-
-exports.dbWrite = (key,value)=>{
-    return writeFunc(key,value)
-}
-
-exports.dbRead = (key)=>{
-    return readFunc(key)
 }

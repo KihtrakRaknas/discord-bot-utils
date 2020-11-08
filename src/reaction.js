@@ -26,16 +26,22 @@ let askWithReactions = (message, emojiObj) => {
     return emojiSelection;
 }
 
-let listenForReaction = (message,emojiObj,id,callback)=>{//user.id (optional)
+let listenForReaction = (message,emojiObj,target,callback)=>{//target is a user obj (optional)
     const emojiArr = Object.keys(emojiObj)
     for (let emoji of emojiArr)
         message.react(emoji)
-    const collector = message.createReactionCollector((reaction, user) =>(emojiArr.includes(reaction.emoji.name) && (id == null || user.id === id)), { time: 60000 })
-    collector.on('collect', (reaction, user) => {
-        if (reaction.count > 1) {
-            callback(emojiObj[reaction.emoji.name],user)
+    const collector = message.createReactionCollector((reaction, user) =>(emojiArr.includes(reaction.emoji.name) && (target == null || user.id === target.id)), { time: 60000, dispose: true })
+    let old = {}
+    let reactionUpdated = (reaction, user) => {  
+        if(emojiArr.includes(reaction.emoji.name)){
+            if(old[reaction.emoji.name]!=reaction.count){
+                callback(emojiObj[reaction.emoji.name],user)
+            }
+            old[reaction.emoji.name] = reaction.count
         }
-    });
+    }
+    collector.on('collect', reactionUpdated);
+    collector.on('remove', reactionUpdated);
 }
 
 exports.getSelection = async (message, emojisObj, sendMedium) => {

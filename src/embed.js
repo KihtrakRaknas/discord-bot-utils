@@ -27,8 +27,40 @@ params = {  //everything is optional
     timestamp: false,
     thumbnail:"",
     image:"",
+    keepPropsInOverflow:false,
+    feildLimit:25,
 }
 */
+
+let setUpEmbed=(embed, params)=>{
+    let charCount = 0
+    if(params.title){
+        let [countTitle, title] = checkChar(params.title,256)
+        charCount+=countTitle
+        embed.setTitle(title)
+    }
+    if(params.desc){
+        let [countDesc, desc] = checkChar(params.desc,2048)
+        charCount+=countDesc
+        embed.setDescription(desc)
+    }
+    if(params.thumbnail)
+        embed.setThumbnail(params.thumbnail)
+    if(params.image)
+        embed.setImage(params.image)
+    if(params.timestamp)
+        embed.setTimestamp()
+    if(params.author){
+        let [countAuthor, author] = checkChar(params.author,256)
+        charCount+=countAuthor
+        embed.setAuthor(author, params.authorImg, params.authorLink)
+    }
+    let [countFooter, footer] = checkChar(params.footer?params.footer:"Bot by Karthik & Franklin",2048)
+    charCount+=countFooter
+    if(footer !== "")
+        embed.setFooter(footer, params.footerImage?params.footerImage:"")
+    return charCount
+}
 
 exports.embedArr=(params)=>{
     if(params==null)
@@ -36,30 +68,7 @@ exports.embedArr=(params)=>{
     let embed = new Discord.MessageEmbed()
     embed.setColor(params.color?params.color:color)
 
-    let charCount = 0
-    let [countTitle, title] = checkChar(params.title,256)
-    charCount+=countTitle
-    embed.setTitle(title)
-
-    let [countDesc, desc] = checkChar(params.desc,2048)
-    charCount+=countDesc
-    embed.setDescription(desc)
-
-    if(params.thumbnail)
-        embed.setThumbnail(params.thumbnail)
-    if(params.image)
-        embed.setImage(params.image)
-    if(params.timestamp)
-        embed.setTimestamp()
-
-    let [countAuthor, author] = checkChar(params.author,256)
-    charCount+=countAuthor
-    embed.setAuthor(author, params.authorImg, params.authorLink)
-
-    let [countFooter, footer] = checkChar(params.footer?params.footer:"Bot by Karthik & Franklin",2048)
-    charCount+=countFooter
-    if(footer !== "")
-        embed.setFooter(footer, params.footerImage?params.footerImage:"")
+    let charCount = setUpEmbed(embed,params)
 
     let embeds = []
     let fieldsAdded = 0
@@ -70,12 +79,15 @@ exports.embedArr=(params)=>{
             msgLength+=countTitle+4;
             let [countValue, valueTxt] = checkChar(field[1],1024);
             msgLength+=countValue;
-            if(charCount+msgLength>6000||fieldsAdded==25){
+            if(charCount+msgLength>6000||fieldsAdded==(params.feildLimit?params.feildLimit:25)){
                 charCount=0
                 fieldsAdded = 0
                 embeds.push(embed)
                 embed = new Discord.MessageEmbed()
                 embed.setColor(params.color?params.color:color)
+                if(params.keepPropsInOverflow){
+                    charCount = setUpEmbed(embed,params)
+                }
             }
             fieldsAdded++
             charCount+=msgLength
@@ -85,15 +97,25 @@ exports.embedArr=(params)=>{
     return embeds
 }
 
-exports.embedWithPages=(params,targetID)=>{ //targetID ID of person who can respond (Optional)
-    const embeds = exports.embedArr(params)
+
+exports.sendEmbedsAsPages=async (embeds,channelToSend,target)=>{ //targetID ID of person who can respond (Optional)
     let embedPage = 0
-    listenForReaction(embeds,{'➡':"next",'⬅':"prev"},targetID,(reaction)=>{
-        if(reaction=="next")
-            if(embedPage<embeds.length-1)
-                embedPage++
-        else if(reaction=="prev")
-            if(embedPage>0)
-                embedPage--
-    })
+    const numberOfEmbeds = embeds.length
+    embeds.forEach((embed,i)=>embed.setFooter(`Page ${i+1} of ${numberOfEmbeds}`))
+    const message = await channelToSend.send(embeds[embedPage])
+    if(numberOfEmbeds!=1){
+        listenForReaction(message,{'⬅':"prev",'➡':"next"},target,(reaction)=>{
+            // console.log(reaction)
+            if(reaction=="next"){
+                if(embedPage<numberOfEmbeds-1)
+                    embedPage++
+            }else if(reaction=="prev"){
+                if(embedPage>0)
+                    embedPage--
+            }else
+                return;
+            // console.log(embedPage)
+            message.edit(embeds[embedPage])
+        })
+    } 
 }

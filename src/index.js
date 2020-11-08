@@ -11,6 +11,7 @@ let isDebug = false
 exports.isDebug = isDebug
 exports.channels = channels
 exports.client = client
+exports.admins = admins
 exports.Discord = Discord
 
 
@@ -99,8 +100,16 @@ exports.addChannelFromArr = (channelsArr) => {
 let sendHelpMsg = (message) => { // AUX function
     const newEmbed = new Discord.MessageEmbed().setTitle(`**Commands**`)
     for (let cmdObj of cmdObjs)
-        newEmbed.addField(`**${cmdObj["cmd"]?cmdObj["cmd"]:cmdObj["cmds"][0]}**`, cmdObj["desc"])
+        if(!cmdObj["admin"]||(cmdObj["admin"] && admins.includes(message.author.id)))
+            newEmbed.addField(`**${cmdObj["cmd"]?cmdObj["cmd"]:cmdObj["cmds"][0]}${cmdObj["admin"]?` (Admin Only)`:``}**`, cmdObj["desc"])
     message.reply(newEmbed)
+}
+
+exports.getUserFromMention = (mention) => {
+	const matches = mention.match(/^<@!?(\d+)>$/);
+	if (!matches) return;
+	const id = matches[1];
+	return client.users.cache.get(id);
 }
 
 exports.onMessage = (newCmdObjs) => {
