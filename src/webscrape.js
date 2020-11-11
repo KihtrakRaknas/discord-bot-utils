@@ -15,13 +15,19 @@ exports.checkSite = async (url, items, uid, uidAttr, action) => {
         else if(isDebug)
             console.log(`Tried to read from webScrapeUIDs-package-var but no DB init`)
         webScrapeUIDs = webscrapeArr?webscrapeArr:[]
+        if(isDebug)
+            console.log(`webScrapeUIDs is now: ${webScrapeUIDs}`)   
     }
          
     const response = await got(url);
     const $ = cheerio.load(response.body);
 
     $(items).each((i, el) => {
-        let href = $(uid, el).attr(uidAttr)
+        let href
+        if(!uidAttr)
+            href = $(uid, el).text()
+        else
+            href = $(uid, el).attr(uidAttr)
         if (href && !webScrapeUIDs.includes(href)) {
             webScrapeUIDs.push(href)
             if (action)
@@ -36,4 +42,9 @@ exports.checkSite = async (url, items, uid, uidAttr, action) => {
 
 exports.delWebScrapeUIDs = () => {
     webScrapeUIDs.shift()
+}
+
+exports.resetWebScrapeUIDs = () => {
+    webScrapeUIDs=[]
+    exports.dbWrite("webScrapeUIDs-package-var",webScrapeUIDs)
 }

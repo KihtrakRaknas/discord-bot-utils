@@ -131,10 +131,11 @@ exports.onMessage = (newCmdObjs) => {
         admin: false
     }]
     client.on('message', message => {
-        message.member.roles.cache.forEach(r => {
-            if(r.name==='Muted')
-                message.delete()
-        });
+        if(message.member&&message.member.roles)
+            message.member.roles.cache.forEach(r => {
+                if(r.name==='Muted')
+                    message.delete()
+            });
         if (!message.content.startsWith(prefix) || message.author.bot) return;
         const args = message.content.slice(prefix.length).trim().split(' ');
         const command = args.shift().toLowerCase();

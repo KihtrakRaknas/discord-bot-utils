@@ -44,14 +44,27 @@ exports.initDB = (type, setUpObj)=>{
             })
         }
 
-        exports.dbIncrement = (key,inc)=>{
+        exports.dbIncrement = (key, inc)=>{
             return exports.dbRead(key).then(val=>exports.dbWrite(key,(val&&(typeof val == "number"|| typeof val == "string"))?(val+inc):inc)) 
         }
-        exports.dbPush = (key,newEl)=>{
+        exports.dbPush = (key, newEl)=>{
             return exports.dbRead(key).then(val=>exports.dbWrite(key,(val&&typeof val == "object")?[...val, newEl]:[newEl])) 
         }
-        exports.dbPushMulti = (key,newEls)=>{
+        exports.dbPushMulti = (key, newEls)=>{
             return exports.dbRead(key).then(val=>exports.dbWrite(key,(val&&typeof val == "object")?[...val, ...newEls]:[...newEls])) 
+        }
+        exports.dbUpdateObj = (key, newEls)=>{
+            return exports.dbRead(key).then(val=>exports.dbWrite(key,(val&&typeof val == "object")?{...val, ...newEls}:newEls)) 
+        }
+        exports.dbIncrementObj = (key, newEls)=>{
+            return exports.dbRead(key).then(val=>{
+                if(!val||!typeof val == "object")
+                    val = {}
+                for(let key in newEls){
+                    val[key] = newEls[key]
+                }
+                exports.dbWrite(key,val)
+            })
         }
     }else if(type == "sheets"){
         /*  SETUPOBJ SCHEMA
