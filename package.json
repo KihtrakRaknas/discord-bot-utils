@@ -1,6 +1,6 @@
 {
   "name": "@kihtrak/discord-bot-utils",
-  "version": "4.89.0",
+  "version": "4.90.0",
   "description": "A small package created by Karthik Sankar and Franklin Yin to assist in making discord bots",
   "main": "min.js",
   "scripts": {
