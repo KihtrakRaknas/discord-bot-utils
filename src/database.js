@@ -26,9 +26,10 @@ exports.initDB = (type, setUpObj)=>{
             return db.set(key,value).then(()=>{
                 if(isDebug)
                     db.get(key).then(currValue=>{
-                        if(value != currValue)
+                        if(value != currValue){
                             console.log(`Database not updated. Key: ${key}; New Value: ${value}`)
                             console.log(`Current Value: ${currValue}`)
+                        }
                     })
             })
         }
