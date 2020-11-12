@@ -34,6 +34,7 @@ exports.checkSite = async (url, items, uid, uidAttr, action) => {
                 action(el, href)
         }
     })
+    
     if(exports.dbWrite)
         exports.dbWrite("webScrapeUIDs-package-var",webScrapeUIDs)
     else if(isDebug)

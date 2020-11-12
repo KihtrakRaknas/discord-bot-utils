@@ -70,6 +70,7 @@ exports.initDB = (type, setUpObj)=>{
                 exports.dbWrite(key,val)
             })
         }
+        exports.dbRepl = db
     }else if(type == "sheets"){
         /*  SETUPOBJ SCHEMA
         {

@@ -116,6 +116,7 @@ let sendHelpMsg = (message) => { // AUX function
 }
 
 exports.getUserFromMention = (mention) => {
+    if (!mention) return;
 	const matches = mention.match(/^<@!?(\d+)>$/);
 	if (!matches) return;
 	const id = matches[1];
@@ -147,7 +148,7 @@ exports.onMessage = (newCmdObjs) => {
                     message.delete()
             });
         if (!message.content.startsWith(prefix) || message.author.bot) return;
-        const args = message.content.slice(prefix.length).trim().split(' ');
+        const args = message.content.slice(prefix.length).trim().split(' ').filter(str=>str);
         const command = args.shift().toLowerCase();
         const isAdmin = admins.includes(message.author.id)
         for (let cmdObj of cmdObjs) {
