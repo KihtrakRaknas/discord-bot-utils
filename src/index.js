@@ -3,9 +3,9 @@ const client = new Discord.Client();
 const got = require('got');
 require('dotenv').config()
 let channels = []
-let prefix
 let admins = []
 let cmdObjs
+let prefix=""
 let isDebug = false
 
 exports.isDebug = isDebug
@@ -61,6 +61,10 @@ exports.setPrefix = (newPrefix) => {
     prefix = newPrefix
 }
 
+exports.getPrefix = () => {
+    return prefix
+}
+
 exports.addAdmin = (admin) => {
     if (!admins.includes(admin))
         admins.push(admin)
@@ -98,11 +102,17 @@ exports.addChannelFromArr = (channelsArr) => {
 }
 
 let sendHelpMsg = (message) => { // AUX function
-    const newEmbed = new Discord.MessageEmbed().setTitle(`**Commands**`)
+    const fields = []
     for (let cmdObj of cmdObjs)
-        if(!cmdObj["admin"]||(cmdObj["admin"] && admins.includes(message.author.id)))
-            newEmbed.addField(`**${cmdObj["cmd"]?cmdObj["cmd"]:cmdObj["cmds"][0]}${cmdObj["admin"]?` (Admin Only)`:``}**`, cmdObj["desc"])
-    message.reply(newEmbed)
+        if((!cmdObj["admin"]||(cmdObj["admin"] && admins.includes(message.author.id)))&&!cmdObj["hidden"])
+            fields.push([`**${cmdObj["cmd"]?cmdObj["cmd"]:cmdObj["cmds"][0]}${cmdObj["admin"]?` (Admin Only)`:``}**`, `${(cmdObj["syntax"]?`\`\`${cmdObj["syntax"]}\`\`\n`:"")}${cmdObj["desc"]}`])
+    const embeds = exports.embedArr({
+        title:"**Commands**",
+        fields:fields,
+        footer:""
+    })
+    for(let embed of embeds)
+        message.reply(embed)
 }
 
 exports.getUserFromMention = (mention) => {

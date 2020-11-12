@@ -61,7 +61,9 @@ exports.initDB = (type, setUpObj)=>{
                 if(!val||!typeof val == "object")
                     val = {}
                 for(let key in newEls){
-                    val[key] = newEls[key]
+                    if(!val[key])
+                        val[key] = 0
+                    val[key] += newEls[key]
                 }
                 exports.dbWrite(key,val)
             })

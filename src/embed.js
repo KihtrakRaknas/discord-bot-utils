@@ -29,6 +29,7 @@ params = {  //everything is optional
     image:"",
     keepPropsInOverflow:false,
     feildLimit:25,
+    titleLink:''
 }
 */
 
@@ -50,16 +51,19 @@ let setUpEmbed=(embed, params)=>{
         embed.setImage(params.image)
     if(params.timestamp)
         embed.setTimestamp()
+    if(params.titleLink)
+        embed.setURL(params.titleLink)
     if(params.author){
         let [countAuthor, author] = checkChar(params.author,256)
         charCount+=countAuthor
         embed.setAuthor(author, params.authorImg, params.authorLink)
     }
-    let [countFooter, footer] = checkChar(params.footer?params.footer:"Bot by Karthik & Franklin",2048)
-    charCount+=countFooter
-    if(footer !== "")
+    if(params.footer !== ""){
+        let [countFooter, footer] = checkChar(params.footer?params.footer:"Bot by Karthik & Franklin",2048)
+        charCount+=countFooter
         embed.setFooter(footer, params.footerImage?params.footerImage:"")
-    return charCount
+    }
+        return charCount
 }
 
 exports.embedArr=(params)=>{
